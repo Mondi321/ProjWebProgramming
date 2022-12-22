@@ -9,6 +9,7 @@
         public decimal Rating { get; set; }
         public decimal MovieLength { get; set; }
         public ICollection<Genre> Genres { get; set; } = new List<Genre>();
+        public List<MovieGenre>? MovieGenres { get; set; }
         public ICollection<User>? Users { get; set; } = new List<User>();
     }
 }

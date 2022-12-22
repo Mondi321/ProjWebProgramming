@@ -185,24 +185,25 @@ namespace ProjWebProgramming.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GenreMovie",
+                name: "MovieGenre",
                 columns: table => new
                 {
-                    GenresGenreId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MoviesMovieId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    MovieId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    GenreId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GenreMovie", x => new { x.GenresGenreId, x.MoviesMovieId });
+                    table.PrimaryKey("PK_MovieGenre", x => new { x.MovieId, x.GenreId });
                     table.ForeignKey(
-                        name: "FK_GenreMovie_Genres_GenresGenreId",
-                        column: x => x.GenresGenreId,
+                        name: "FK_MovieGenre_Genres_GenreId",
+                        column: x => x.GenreId,
                         principalTable: "Genres",
                         principalColumn: "GenreId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GenreMovie_Movies_MoviesMovieId",
-                        column: x => x.MoviesMovieId,
+                        name: "FK_MovieGenre_Movies_MovieId",
+                        column: x => x.MovieId,
                         principalTable: "Movies",
                         principalColumn: "MovieId",
                         onDelete: ReferentialAction.Cascade);
@@ -272,9 +273,9 @@ namespace ProjWebProgramming.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GenreMovie_MoviesMovieId",
-                table: "GenreMovie",
-                column: "MoviesMovieId");
+                name: "IX_MovieGenre_GenreId",
+                table: "MovieGenre",
+                column: "GenreId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MovieUser_UsersId",
@@ -300,7 +301,7 @@ namespace ProjWebProgramming.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "GenreMovie");
+                name: "MovieGenre");
 
             migrationBuilder.DropTable(
                 name: "MovieUser");

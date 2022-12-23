@@ -20,10 +20,45 @@ namespace ProjWebProgramming.Controllers
         }
 
         // GET: MovieGenres
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+             string sortOrder,
+             string currentFilter,
+             string searchString,
+             int? pageNumber)
         {
-            var applicationDbContext = _context.MovieGenre.Include(m => m.Genre).Include(m => m.Movie);
-            return View(await applicationDbContext.ToListAsync());
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+
+                searchString = currentFilter;
+
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
+            var moviesGenre = from mg in _context.MovieGenre
+                         select mg;
+
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    moviesGenre = moviesGenre.OrderByDescending(mg => mg.Movie);
+                    break;
+                case "Date":
+                    moviesGenre = moviesGenre.OrderBy(mg => mg.Genre);
+                    break;
+            }
+            int pageSize = 3;
+
+            return View(await PaginatedList<MovieGenre>.CreateAsync(moviesGenre.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
         // GET: MovieGenres/Details/5

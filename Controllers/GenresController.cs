@@ -20,9 +20,41 @@ namespace ProjWebProgramming.Controllers
         }
 
         // GET: Genres
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+              string sortOrder,
+              string currentFilter,
+              string searchString,
+              int? pageNumber)
         {
-              return View(await _context.Genres.ToListAsync());
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+
+                searchString = currentFilter;
+
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
+            var genres = from g in _context.Genres
+                              select g;
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    genres = genres.OrderByDescending(g => g.Name);
+                    break;
+            }
+            int pageSize = 3;
+
+            return View(await PaginatedList<Genre>.CreateAsync(genres.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
         // GET: Genres/Details/5

@@ -20,10 +20,61 @@ namespace ProjWebProgramming.Controllers
         }
 
         // GET: Movies
-        public async Task<IActionResult> Index()
+
+        /* public async Task<IActionResult> Index()
+         {
+               return View(await _context.Movies.ToListAsync());
+         }*/
+
+        public async Task<IActionResult> Index(
+            string sortOrder,
+            string currentFilter,
+            string searchString,
+            int? pageNumber)
         {
-              return View(await _context.Movies.ToListAsync());
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+           
+            if(searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+
+                searchString = currentFilter;
+
+            }
+            
+            
+            ViewData["CurrentFilter"] = searchString;
+            
+            var movies = from m in _context.Movies
+                           select m;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                movies = movies.Where(m => m.Title.Contains(searchString));
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    movies = movies.OrderByDescending(m => m.Title);
+                    break;
+                case "Date":
+                    movies = movies.OrderBy(m => m.ReleaseYear);
+                    break;
+                case "date_desc":
+                    movies = movies.OrderByDescending(m => m.Rating);
+                    break;
+            }
+            int pageSize = 3;
+
+            return View(await PaginatedList<Movie>.CreateAsync(movies.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
+
 
         // GET: Movies/Details/5
         public async Task<IActionResult> Details(Guid? id)

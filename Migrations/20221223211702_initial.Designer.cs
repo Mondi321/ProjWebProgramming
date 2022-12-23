@@ -12,7 +12,7 @@ using ProjWebProgramming.Data;
 namespace ProjWebProgramming.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221221160425_initial")]
+    [Migration("20221223211702_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -174,6 +174,32 @@ namespace ProjWebProgramming.Migrations
                     b.ToTable("MovieUser");
                 });
 
+            modelBuilder.Entity("ProjWebProgramming.Models.Actor", b =>
+                {
+                    b.Property<Guid>("ActorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nationality")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ActorId");
+
+                    b.ToTable("Actor");
+                });
+
             modelBuilder.Entity("ProjWebProgramming.Models.Genre", b =>
                 {
                     b.Property<Guid>("GenreId")
@@ -215,6 +241,21 @@ namespace ProjWebProgramming.Migrations
                     b.HasKey("MovieId");
 
                     b.ToTable("Movies");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.MovieActors", b =>
+                {
+                    b.Property<Guid>("ActorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MovieId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ActorId", "MovieId");
+
+                    b.HasIndex("MovieId");
+
+                    b.ToTable("MovieActors");
                 });
 
             modelBuilder.Entity("ProjWebProgramming.Models.MovieGenre", b =>
@@ -377,6 +418,25 @@ namespace ProjWebProgramming.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ProjWebProgramming.Models.MovieActors", b =>
+                {
+                    b.HasOne("ProjWebProgramming.Models.Actor", "Actor")
+                        .WithMany("MovieActors")
+                        .HasForeignKey("ActorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjWebProgramming.Models.Movie", "Movie")
+                        .WithMany("MovieActors")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Actor");
+
+                    b.Navigation("Movie");
+                });
+
             modelBuilder.Entity("ProjWebProgramming.Models.MovieGenre", b =>
                 {
                     b.HasOne("ProjWebProgramming.Models.Genre", "Genre")
@@ -396,6 +456,11 @@ namespace ProjWebProgramming.Migrations
                     b.Navigation("Movie");
                 });
 
+            modelBuilder.Entity("ProjWebProgramming.Models.Actor", b =>
+                {
+                    b.Navigation("MovieActors");
+                });
+
             modelBuilder.Entity("ProjWebProgramming.Models.Genre", b =>
                 {
                     b.Navigation("MovieGenres");
@@ -403,6 +468,8 @@ namespace ProjWebProgramming.Migrations
 
             modelBuilder.Entity("ProjWebProgramming.Models.Movie", b =>
                 {
+                    b.Navigation("MovieActors");
+
                     b.Navigation("MovieGenres");
                 });
 #pragma warning restore 612, 618

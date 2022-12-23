@@ -10,6 +10,8 @@
         public decimal MovieLength { get; set; }
         public ICollection<Genre> Genres { get; set; } = new List<Genre>();
         public List<MovieGenre>? MovieGenres { get; set; }
+        public ICollection<Actor> Actors{ get; set; } = new List<Actor>();
+        public List<MovieActors>? MovieActors{ get; set; }
         public ICollection<User>? Users { get; set; } = new List<User>();
     }
 }

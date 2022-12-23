@@ -36,8 +36,24 @@ namespace ProjWebProgramming.Data
                         j.Property(pt => pt.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                         j.HasKey(t => new { t.MovieId, t.GenreId});
                     });
+            modelBuilder.Entity<Movie>()
+                .HasMany(p => p.Actors)
+                .WithMany(p => p.Movies)
+                .UsingEntity<MovieActors>(
+                    j => j
+                        .HasOne(pt => pt.Actor)
+                        .WithMany(t => t.MovieActors)
+                        .HasForeignKey(pt => pt.ActorId),
+                    j => j
+                        .HasOne(pt => pt.Movie)
+                        .WithMany(p => p.MovieActors)
+                        .HasForeignKey(pt => pt.MovieId));
         }
 
         public DbSet<ProjWebProgramming.Models.MovieGenre> MovieGenre { get; set; }
+
+        public DbSet<ProjWebProgramming.Models.Actor> Actor { get; set; }
+
+        public DbSet<ProjWebProgramming.Models.MovieActors> MovieActors { get; set; }
     }
 }

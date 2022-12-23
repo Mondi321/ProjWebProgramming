@@ -20,66 +20,31 @@ namespace ProjWebProgramming.Controllers
         }
 
         // GET: MovieGenres
-        public async Task<IActionResult> Index(
-             string sortOrder,
-             string currentFilter,
-             string searchString,
-             int? pageNumber)
+        public async Task<IActionResult> Index()
         {
-            ViewData["CurrentSort"] = sortOrder;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
-
-            if (searchString != null)
-            {
-                pageNumber = 1;
-            }
-            else
-            {
-
-                searchString = currentFilter;
-
-            }
-
-            ViewData["CurrentFilter"] = searchString;
-
-            var moviesGenre = from mg in _context.MovieGenre
-                         select mg;
-
-
-            switch (sortOrder)
-            {
-                case "name_desc":
-                    moviesGenre = moviesGenre.OrderByDescending(mg => mg.Movie);
-                    break;
-                case "Date":
-                    moviesGenre = moviesGenre.OrderBy(mg => mg.Genre);
-                    break;
-            }
-            int pageSize = 3;
-
-            return View(await PaginatedList<MovieGenre>.CreateAsync(moviesGenre.AsNoTracking(), pageNumber ?? 1, pageSize));
+            var applicationDbContext = _context.MovieGenre.Include(m => m.Genre).Include(m => m.Movie);
+            return View(await applicationDbContext.ToListAsync());
         }
 
         // GET: MovieGenres/Details/5
-        public async Task<IActionResult> Details(Guid? id)
-        {
-            if (id == null || _context.MovieGenre == null)
-            {
-                return NotFound();
-            }
+        //public async Task<IActionResult> Details(Guid? id)
+        //{
+        //    if (id == null || _context.MovieGenre == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var movieGenre = await _context.MovieGenre
-                .Include(m => m.Genre)
-                .Include(m => m.Movie)
-                .FirstOrDefaultAsync(m => m.MovieId == id);
-            if (movieGenre == null)
-            {
-                return NotFound();
-            }
+        //    var movieGenre = await _context.MovieGenre
+        //        .Include(m => m.Genre)
+        //        .Include(m => m.Movie)
+        //        .FirstOrDefaultAsync(m => m.MovieId == id);
+        //    if (movieGenre == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return View(movieGenre);
-        }
+        //    return View(movieGenre);
+        //}
 
         // GET: MovieGenres/Create
         public IActionResult Create()

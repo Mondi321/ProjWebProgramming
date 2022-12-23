@@ -10,6 +10,21 @@ namespace ProjWebProgramming.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Actor",
+                columns: table => new
+                {
+                    ActorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Nationality = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Actor", x => x.ActorId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
                 {
@@ -185,6 +200,30 @@ namespace ProjWebProgramming.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MovieActors",
+                columns: table => new
+                {
+                    MovieId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ActorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MovieActors", x => new { x.ActorId, x.MovieId });
+                    table.ForeignKey(
+                        name: "FK_MovieActors_Actor_ActorId",
+                        column: x => x.ActorId,
+                        principalTable: "Actor",
+                        principalColumn: "ActorId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MovieActors_Movies_MovieId",
+                        column: x => x.MovieId,
+                        principalTable: "Movies",
+                        principalColumn: "MovieId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MovieGenre",
                 columns: table => new
                 {
@@ -273,6 +312,11 @@ namespace ProjWebProgramming.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MovieActors_MovieId",
+                table: "MovieActors",
+                column: "MovieId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MovieGenre_GenreId",
                 table: "MovieGenre",
                 column: "GenreId");
@@ -301,6 +345,9 @@ namespace ProjWebProgramming.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "MovieActors");
+
+            migrationBuilder.DropTable(
                 name: "MovieGenre");
 
             migrationBuilder.DropTable(
@@ -308,6 +355,9 @@ namespace ProjWebProgramming.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Actor");
 
             migrationBuilder.DropTable(
                 name: "Genres");

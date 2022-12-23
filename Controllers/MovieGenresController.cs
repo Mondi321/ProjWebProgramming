@@ -88,22 +88,36 @@ namespace ProjWebProgramming.Controllers
         //}
 
         // GET: MovieGenres/Edit/5
-        public async Task<IActionResult> Edit(Guid movieId, Guid genreId)
-        {
-            if (_context.MovieGenre == null)
-            {
-                return NotFound();
-            }
+        //public async Task<IActionResult> Edit(Guid movieId, Guid genreId)
+        //{
+        //    if (_context.MovieGenre == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var movieGenre = await _context.MovieGenre.FindAsync(movieId,genreId);
-            if (movieGenre == null)
-            {
-                return NotFound();
-            }
-            ViewData["GenreId"] = new SelectList(_context.Genres, "GenreId", "Name", movieGenre.GenreId);
-            ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "Title", movieGenre.MovieId);
-            return View(movieGenre);
-        }
+        //    var movieGenre = await _context.MovieGenre.FindAsync(movieId,genreId);
+        //    if (movieGenre == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    ViewData["GenreId"] = new SelectList(_context.Genres, "GenreId", "Name", movieGenre.GenreId);
+        //    ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "Title", movieGenre.MovieId);
+        //    return View(movieGenre);
+        //}
+
+        //[HttpPost]
+        //public IActionResult Edit(DateTime dateTime,Guid movieId, Guid genreId)
+        //{
+        //    MovieGenre movieGenre = new MovieGenre
+        //    {
+        //        CreatedAt = dateTime,
+        //        MovieId = movieId,
+        //        GenreId = genreId
+        //    };
+        //    this._context.Update(movieGenre);
+        //    this._context.SaveChanges();
+        //    return RedirectToAction(nameof(Index));
+        //}
 
         // POST: MovieGenres/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -146,48 +160,48 @@ namespace ProjWebProgramming.Controllers
         //    return View(movieGenre);
         //}
 
-        // GET: MovieGenres/Delete/5
-        //public async Task<IActionResult> Delete(Guid? id)
-        //{
-        //    if (id == null || _context.MovieGenre == null)
-        //    {
-        //        return NotFound();
-        //    }
+        //GET: MovieGenres/Delete/5
+        public async Task<IActionResult> Delete(Guid movieId, Guid genreId)
+        {
+            if (movieId == null || genreId == null || _context.MovieGenre == null)
+            {
+                return NotFound();
+            }
 
-        //    var movieGenre = await _context.MovieGenre
-        //        .Include(m => m.Genre)
-        //        .Include(m => m.Movie)
-        //        .FirstOrDefaultAsync(m => m.MovieId == id);
-        //    if (movieGenre == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var movieGenre = await _context.MovieGenre
+                .Include(m => m.Genre)
+                .Include(m => m.Movie)
+                .FirstOrDefaultAsync(m => m.MovieId == movieId && m.GenreId == genreId);
+            if (movieGenre == null)
+            {
+                return NotFound();
+            }
 
-        //    return View(movieGenre);
-        //}
+            return View(movieGenre);
+        }
 
-        // POST: MovieGenres/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(Guid id)
-        //{
-        //    if (_context.MovieGenre == null)
-        //    {
-        //        return Problem("Entity set 'ApplicationDbContext.MovieGenre'  is null.");
-        //    }
-        //    var movieGenre = await _context.MovieGenre.FindAsync(id);
-        //    if (movieGenre != null)
-        //    {
-        //        _context.MovieGenre.Remove(movieGenre);
-        //    }
-            
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
+        //POST: MovieGenres/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(Guid movieId, Guid genreId)
+        {
+            if (_context.MovieGenre == null)
+            {
+                return Problem("Entity set 'ApplicationDbContext.MovieGenre'  is null.");
+            }
+            var movieGenre = await _context.MovieGenre.FindAsync(movieId, genreId);
+            if (movieGenre != null)
+            {
+                _context.MovieGenre.Remove(movieGenre);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
 
         //private bool MovieGenreExists(Guid id)
         //{
-        //  return _context.MovieGenre.Any(e => e.MovieId == id);
+        //    return _context.MovieGenre.Any(e => e.MovieId == id);
         //}
     }
 }

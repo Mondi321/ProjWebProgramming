@@ -12,6 +12,9 @@
         public List<MovieGenre>? MovieGenres { get; set; }
         public ICollection<Actor> Actors{ get; set; } = new List<Actor>();
         public List<MovieActors>? MovieActors{ get; set; }
-        public ICollection<User>? Users { get; set; } = new List<User>();
+        public ICollection<User> Users { get; set; } = new List<User>();
+        public List<Wishlist>? Wishlists { get; set; }
+        public Guid DirectorId { get; set; }
+        public Director? Director { get; set; }
     }
 }

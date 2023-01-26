@@ -10,91 +10,86 @@ using ProjWebProgramming.Models;
 
 namespace ProjWebProgramming.Controllers
 {
-    public class MoviesController : Controller
+    public class DirectorsController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public MoviesController(ApplicationDbContext context)
+        public DirectorsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Movies
+        // GET: Directors
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Movies.Include(m => m.Director);
-            return View(await applicationDbContext.ToListAsync());
+              return View(await _context.Directors.ToListAsync());
         }
 
-        // GET: Movies/Details/5
+        // GET: Directors/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
-            if (id == null || _context.Movies == null)
+            if (id == null || _context.Directors == null)
             {
                 return NotFound();
             }
 
-            var movie = await _context.Movies
-                .Include(m => m.Director)
-                .FirstOrDefaultAsync(m => m.MovieId == id);
-            if (movie == null)
+            var director = await _context.Directors
+                .FirstOrDefaultAsync(m => m.DirectorId == id);
+            if (director == null)
             {
                 return NotFound();
             }
 
-            return View(movie);
+            return View(director);
         }
 
-        // GET: Movies/Create
+        // GET: Directors/Create
         public IActionResult Create()
         {
-            ViewData["DirectorId"] = new SelectList(_context.Directors, "DirectorId", "FirstName");
             return View();
         }
 
-        // POST: Movies/Create
+        // POST: Directors/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MovieId,Title,Description,ReleaseYear,Rating,MovieLength,DirectorId")] Movie movie)
+        public async Task<IActionResult> Create([Bind("DirectorId,FirstName,LastName,Nationality,BirthDate")] Director director)
         {
             if (ModelState.IsValid)
             {
-                movie.MovieId = Guid.NewGuid();
-                _context.Add(movie);
+                director.DirectorId = Guid.NewGuid();
+                _context.Add(director);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["DirectorId"] = new SelectList(_context.Directors, "DirectorId", "FirstName", movie.DirectorId);
-            return View(movie);
+            return View(director);
         }
 
-        // GET: Movies/Edit/5
+        // GET: Directors/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
-            if (id == null || _context.Movies == null)
+            if (id == null || _context.Directors == null)
             {
                 return NotFound();
             }
 
-            var movie = await _context.Movies.FindAsync(id);
-            if (movie == null)
+            var director = await _context.Directors.FindAsync(id);
+            if (director == null)
             {
                 return NotFound();
             }
-            ViewData["DirectorId"] = new SelectList(_context.Directors, "DirectorId", "FirstName", movie.DirectorId);
-            return View(movie);
+            return View(director);
         }
 
-        // POST: Movies/Edit/5
+        // POST: Directors/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("MovieId,Title,Description,ReleaseYear,Rating,MovieLength,DirectorId")] Movie movie)
+        public async Task<IActionResult> Edit(Guid id, [Bind("DirectorId,FirstName,LastName,Nationality,BirthDate")] Director director)
         {
-            if (id != movie.MovieId)
+            if (id != director.DirectorId)
             {
                 return NotFound();
             }
@@ -103,12 +98,12 @@ namespace ProjWebProgramming.Controllers
             {
                 try
                 {
-                    _context.Update(movie);
+                    _context.Update(director);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MovieExists(movie.MovieId))
+                    if (!DirectorExists(director.DirectorId))
                     {
                         return NotFound();
                     }
@@ -119,51 +114,49 @@ namespace ProjWebProgramming.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["DirectorId"] = new SelectList(_context.Directors, "DirectorId", "FirstName", movie.DirectorId);
-            return View(movie);
+            return View(director);
         }
 
-        // GET: Movies/Delete/5
+        // GET: Directors/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
-            if (id == null || _context.Movies == null)
+            if (id == null || _context.Directors == null)
             {
                 return NotFound();
             }
 
-            var movie = await _context.Movies
-                .Include(m => m.Director)
-                .FirstOrDefaultAsync(m => m.MovieId == id);
-            if (movie == null)
+            var director = await _context.Directors
+                .FirstOrDefaultAsync(m => m.DirectorId == id);
+            if (director == null)
             {
                 return NotFound();
             }
 
-            return View(movie);
+            return View(director);
         }
 
-        // POST: Movies/Delete/5
+        // POST: Directors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            if (_context.Movies == null)
+            if (_context.Directors == null)
             {
-                return Problem("Entity set 'ApplicationDbContext.Movies'  is null.");
+                return Problem("Entity set 'ApplicationDbContext.Directors'  is null.");
             }
-            var movie = await _context.Movies.FindAsync(id);
-            if (movie != null)
+            var director = await _context.Directors.FindAsync(id);
+            if (director != null)
             {
-                _context.Movies.Remove(movie);
+                _context.Directors.Remove(director);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool MovieExists(Guid id)
+        private bool DirectorExists(Guid id)
         {
-          return _context.Movies.Any(e => e.MovieId == id);
+          return _context.Directors.Any(e => e.DirectorId == id);
         }
     }
 }

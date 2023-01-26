@@ -66,6 +66,21 @@ namespace ProjWebProgramming.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Directors",
+                columns: table => new
+                {
+                    DirectorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Nationality = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Directors", x => x.DirectorId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Genres",
                 columns: table => new
                 {
@@ -75,22 +90,6 @@ namespace ProjWebProgramming.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Genres", x => x.GenreId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Movies",
-                columns: table => new
-                {
-                    MovieId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ReleaseYear = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Rating = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    MovieLength = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Movies", x => x.MovieId);
                 });
 
             migrationBuilder.CreateTable(
@@ -200,6 +199,29 @@ namespace ProjWebProgramming.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Movies",
+                columns: table => new
+                {
+                    MovieId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReleaseYear = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Rating = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MovieLength = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    DirectorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Movies", x => x.MovieId);
+                    table.ForeignKey(
+                        name: "FK_Movies_Directors_DirectorId",
+                        column: x => x.DirectorId,
+                        principalTable: "Directors",
+                        principalColumn: "DirectorId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MovieActors",
                 columns: table => new
                 {
@@ -249,24 +271,25 @@ namespace ProjWebProgramming.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MovieUser",
+                name: "Wishlists",
                 columns: table => new
                 {
-                    MoviesMovieId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UsersId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MovieId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MovieUser", x => new { x.MoviesMovieId, x.UsersId });
+                    table.PrimaryKey("PK_Wishlists", x => new { x.MovieId, x.UserId });
                     table.ForeignKey(
-                        name: "FK_MovieUser_AspNetUsers_UsersId",
-                        column: x => x.UsersId,
+                        name: "FK_Wishlists_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_MovieUser_Movies_MoviesMovieId",
-                        column: x => x.MoviesMovieId,
+                        name: "FK_Wishlists_Movies_MovieId",
+                        column: x => x.MovieId,
                         principalTable: "Movies",
                         principalColumn: "MovieId",
                         onDelete: ReferentialAction.Cascade);
@@ -322,9 +345,14 @@ namespace ProjWebProgramming.Migrations
                 column: "GenreId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MovieUser_UsersId",
-                table: "MovieUser",
-                column: "UsersId");
+                name: "IX_Movies_DirectorId",
+                table: "Movies",
+                column: "DirectorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Wishlists_UserId",
+                table: "Wishlists",
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -351,7 +379,7 @@ namespace ProjWebProgramming.Migrations
                 name: "MovieGenre");
 
             migrationBuilder.DropTable(
-                name: "MovieUser");
+                name: "Wishlists");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -367,6 +395,9 @@ namespace ProjWebProgramming.Migrations
 
             migrationBuilder.DropTable(
                 name: "Movies");
+
+            migrationBuilder.DropTable(
+                name: "Directors");
         }
     }
 }

@@ -12,14 +12,14 @@ using ProjWebProgramming.Data;
 namespace ProjWebProgramming.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221223211702_initial")]
+    [Migration("20230126131417_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.12")
+                .HasAnnotation("ProductVersion", "6.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -159,21 +159,6 @@ namespace ProjWebProgramming.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("MovieUser", b =>
-                {
-                    b.Property<Guid>("MoviesMovieId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UsersId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("MoviesMovieId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("MovieUser");
-                });
-
             modelBuilder.Entity("ProjWebProgramming.Models.Actor", b =>
                 {
                     b.Property<Guid>("ActorId")
@@ -198,6 +183,32 @@ namespace ProjWebProgramming.Migrations
                     b.HasKey("ActorId");
 
                     b.ToTable("Actor");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.Director", b =>
+                {
+                    b.Property<Guid>("DirectorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nationality")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("DirectorId");
+
+                    b.ToTable("Directors");
                 });
 
             modelBuilder.Entity("ProjWebProgramming.Models.Genre", b =>
@@ -225,6 +236,9 @@ namespace ProjWebProgramming.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("DirectorId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<decimal>("MovieLength")
                         .HasColumnType("decimal(18,2)");
 
@@ -239,6 +253,8 @@ namespace ProjWebProgramming.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("MovieId");
+
+                    b.HasIndex("DirectorId");
 
                     b.ToTable("Movies");
                 });
@@ -352,6 +368,24 @@ namespace ProjWebProgramming.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("ProjWebProgramming.Models.Wishlist", b =>
+                {
+                    b.Property<Guid>("MovieId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("MovieId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Wishlists");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -403,19 +437,15 @@ namespace ProjWebProgramming.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MovieUser", b =>
+            modelBuilder.Entity("ProjWebProgramming.Models.Movie", b =>
                 {
-                    b.HasOne("ProjWebProgramming.Models.Movie", null)
-                        .WithMany()
-                        .HasForeignKey("MoviesMovieId")
+                    b.HasOne("ProjWebProgramming.Models.Director", "Director")
+                        .WithMany("Movies")
+                        .HasForeignKey("DirectorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProjWebProgramming.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Director");
                 });
 
             modelBuilder.Entity("ProjWebProgramming.Models.MovieActors", b =>
@@ -456,9 +486,33 @@ namespace ProjWebProgramming.Migrations
                     b.Navigation("Movie");
                 });
 
+            modelBuilder.Entity("ProjWebProgramming.Models.Wishlist", b =>
+                {
+                    b.HasOne("ProjWebProgramming.Models.Movie", "Movie")
+                        .WithMany("Wishlists")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjWebProgramming.Models.User", "User")
+                        .WithMany("Wishlists")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Movie");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ProjWebProgramming.Models.Actor", b =>
                 {
                     b.Navigation("MovieActors");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.Director", b =>
+                {
+                    b.Navigation("Movies");
                 });
 
             modelBuilder.Entity("ProjWebProgramming.Models.Genre", b =>
@@ -471,6 +525,13 @@ namespace ProjWebProgramming.Migrations
                     b.Navigation("MovieActors");
 
                     b.Navigation("MovieGenres");
+
+                    b.Navigation("Wishlists");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.User", b =>
+                {
+                    b.Navigation("Wishlists");
                 });
 #pragma warning restore 612, 618
         }

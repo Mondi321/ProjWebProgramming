@@ -1,51 +1,34 @@
-﻿
-@model PaginatedList<ProjWebProgramming.Models.Movie>
+﻿@model IEnumerable<ProjWebProgramming.Models.Movie>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Movies</h1>
+<h1>Index</h1>
 
 <p>
-     <a class="btn btn-primary" role="button" asp-action="Create">Create New</a>
+    <a class="btn btn-primary" asp-action="Create">Create New</a>
 </p>
-
-<form asp-action="Index" method="get">
-    <div class="form-actions no-color d-flex justify-content-end">
-        <p>
-            Find by Title: <input class=" rounded-top rounded-bottom ml-2  border border-primary "type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
-           
-            <button type="submit" class="btn btn-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search" viewBox="0 0 20 20">
-            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-            </svg>
-             </button> 
-            <a  class="btn btn-secondary" role="button" asp-action="Index">Back to List</a>
-        </p>
-
-    </div>
-</form>
-   
-
 <table class="table table-striped table-dark">
     <thead>
         <tr>
-
             <th>
-                 <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]"> Title</a>
+                @Html.DisplayNameFor(model => model.Title)
             </th>
             <th>
-               Description
+                @Html.DisplayNameFor(model => model.Description)
             </th>
             <th>
-                ReleaseYear
+                @Html.DisplayNameFor(model => model.ReleaseYear)
             </th>
             <th>
-               <a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]"  asp-route-currentFilter="@ViewData["CurrentFilter"]"> Rating</a>
+                @Html.DisplayNameFor(model => model.Rating)
             </th>
             <th>
-               MovieLength
+                @Html.DisplayNameFor(model => model.MovieLength)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Director)
             </th>
             <th></th>
         </tr>
@@ -69,44 +52,14 @@
                 @Html.DisplayFor(modelItem => item.MovieLength)
             </td>
             <td>
-
-                <a class="btn btn-warning" role="button" asp-action="Edit" asp-route-id="@item.MovieId">Edit</a> |
-
-                <a class="btn btn-info" role="button" asp-action="Details" asp-route-id="@item.MovieId">Details</a> |
-
-                <a class="btn btn-danger" role="button" asp-action="Delete" asp-route-id="@item.MovieId">Delete</a>
-
+                @Html.DisplayFor(modelItem => item.Director.FirstName)
+            </td>
+            <td>
+                    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.MovieId">Edit</a> |
+                    <a class="btn btn-info" asp-action="Details" asp-route-id="@item.MovieId">Details</a> |
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.MovieId">Delete</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
-
-@{
-    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-}
-
-<a asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.PageIndex - 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @prevDisabled">
- 
-   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-  <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-</svg>
-
-</a>
-<a asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.PageIndex + 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @nextDisabled">
-
- <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
-  <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-</svg>
-</a>
-
-

@@ -6,6 +6,7 @@ namespace ProjWebProgramming.Models
     {
         public string Emri { get; set; } = string.Empty;
         public string Mbiemri { get; set; } = string.Empty;
-        public ICollection<Movie>? Movies { get; set; } = new List<Movie>();
+        public ICollection<Movie> Movies { get; set; } = new List<Movie>();
+        public List<Wishlist>? Wishlists { get; set; }
     }
 }

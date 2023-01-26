@@ -48,6 +48,18 @@ namespace ProjWebProgramming.Data
                         .HasOne(pt => pt.Movie)
                         .WithMany(p => p.MovieActors)
                         .HasForeignKey(pt => pt.MovieId));
+            modelBuilder.Entity<Movie>()
+                .HasMany(p => p.Users)
+                .WithMany(p => p.Movies)
+                .UsingEntity<Wishlist>(
+                    j => j
+                        .HasOne(pt => pt.User)
+                        .WithMany(t => t.Wishlists)
+                        .HasForeignKey(pt => pt.UserId),
+                    j => j
+                        .HasOne(pt => pt.Movie)
+                        .WithMany(p => p.Wishlists)
+                        .HasForeignKey(pt => pt.MovieId));
         }
 
         public DbSet<ProjWebProgramming.Models.MovieGenre> MovieGenre { get; set; }
@@ -55,5 +67,7 @@ namespace ProjWebProgramming.Data
         public DbSet<ProjWebProgramming.Models.Actor> Actor { get; set; }
 
         public DbSet<ProjWebProgramming.Models.MovieActors> MovieActors { get; set; }
+        public DbSet<ProjWebProgramming.Models.Director> Directors{ get; set; }
+        public DbSet<ProjWebProgramming.Models.Wishlist> Wishlists{ get; set; }
     }
 }

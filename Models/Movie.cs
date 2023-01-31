@@ -8,6 +8,7 @@
         public DateTime ReleaseYear { get; set; }
         public decimal Rating { get; set; }
         public decimal MovieLength { get; set; }
+        public byte[]? Image { get; set; }
         public ICollection<Genre> Genres { get; set; } = new List<Genre>();
         public List<MovieGenre>? MovieGenres { get; set; }
         public ICollection<Actor> Actors{ get; set; } = new List<Actor>();

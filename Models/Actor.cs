@@ -7,6 +7,7 @@
         public string LastName { get; set; } = string.Empty;
         public string Nationality { get; set; } = string.Empty;
         public DateTime BirthDate { get; set; }
+        public byte[]? Image { get; set; }
         public ICollection<Movie> Movies { get; set; } = new List<Movie>();
         public List<MovieActors>? MovieActors { get; set; }
     }

@@ -57,10 +57,24 @@ namespace ProjWebProgramming.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MovieId,Title,Description,ReleaseYear,Rating,MovieLength,DirectorId")] Movie movie)
+        public async Task<IActionResult> Create([Bind("MovieId,Title,Description,ReleaseYear,Rating,MovieLength,DirectorId,Image")] Movie movie)
         {
             if (ModelState.IsValid)
             {
+                var files = HttpContext.Request.Form.Files;
+                if(files.Count() > 0)
+                {
+                    byte[] pic = null;
+                    using(var fileStream = files[0].OpenReadStream())
+                    {
+                        using(var memoryStream = new MemoryStream())
+                        {
+                            fileStream.CopyTo(memoryStream);
+                            pic = memoryStream.ToArray();
+                        }
+                        movie.Image = pic;
+                    }
+                }
                 movie.MovieId = Guid.NewGuid();
                 _context.Add(movie);
                 await _context.SaveChangesAsync();

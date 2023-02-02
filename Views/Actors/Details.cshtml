@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Details";
 }
-
+@*
 <h1>Details</h1>
 
 <div>
@@ -54,4 +54,54 @@
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.ActorId" class="btn btn-warning">Edit</a> |
     <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>
+*@
+
+<div class="row text">
+    <div class="col-md-8 offset-2">
+        <p>
+            <h1 class="text-center">Details for @Model.FirstName</h1>
+        </p>
+        <div class="row">
+            <div class="col-md-8 offset-2">
+                <div class="form-group d-flex justify-content-center mb-2">
+                    @if (Model.Image != null)
+                    {
+                        var base64 = Convert.ToBase64String(Model.Image);
+                        var img = string.Format("data:image/jpg;base64,{0}", base64);
+                        <img src="@img" width="100px" height="100px" class="rounded-circle"/>
+                    }
+                    else
+                    {
+                        <img src="~/images/noimage.jpg" width="100px" height="100px" class="rounded-circle"/>
+                    }
+                </div>
+                <div class="form-group mb-2">
+                    <label asp-for="FirstName" class="control-label"></label>
+                    <input asp-for="FirstName" class="form-control" readonly />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-2">
+                    <label asp-for="LastName" class="control-label"></label>
+                    <input asp-for="LastName" class="form-control" readonly />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-2">
+                    <label asp-for="Nationality" class="control-label"></label>
+                    <input asp-for="Nationality" class="form-control" readonly />
+                    <span asp-validation-for="Nationality" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-2">
+                    <label asp-for="BirthDate" class="control-label"></label>
+                    <input asp-for="BirthDate" class="form-control" readonly />
+                    <span asp-validation-for="BirthDate" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mt-3">
+                    <a class="btn btn-outline-warning float-right" asp-action="Edit" asp-route-id="@Model.ActorId">Edit</a>
+                    <a class="btn btn-outline-secondary" asp-action="Index">Back to List</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

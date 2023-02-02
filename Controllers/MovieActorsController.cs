@@ -49,7 +49,7 @@ namespace ProjWebProgramming.Controllers
         // GET: MovieActors/Create
         public IActionResult Create()
         {
-            ViewData["Actor"] = this._context.Actor;
+            ViewData["Actor"] = _context.Actor;
             ViewData["MovieId"] = new SelectList(_context.Movies, "MovieId", "Title");
             return View();
         }

@@ -4,7 +4,7 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+@*@<h1>Details</h1>
 
 <div>
     <h4>Movie</h4>
@@ -66,4 +66,141 @@
 <div>
     <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model?.MovieId">Edit</a> |
     <a class="btn btn-secondary" asp-action="Index">Back to List</a>
+</div>
+
+<div class="row text">
+    <div class="col-md-8 offset-2">
+        <p>
+            <h1 class="text-center">Details for @Model.Title</h1>
+        </p>
+        <div class="row">
+            <div class="col-md-8 offset-2">
+                <div class="form-group d-flex justify-content-center mb-2">
+                    @if (Model.Image != null)
+                    {
+                        var base64 = Convert.ToBase64String(Model.Image);
+                        var img = string.Format("data:image/jpg;base64,{0}", base64);
+                        <img src="@img" width="100px" height="100px"/>
+                    }
+                    else
+                    {
+                        <img src="~/images/noimage.jpg" width="100px" height="100px" />
+                    }
+                </div>
+                <div class="form-group mb-2">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" readonly />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-2">
+                    <label asp-for="Description" class="control-label"></label>
+                    <input asp-for="Description" class="form-control" readonly />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-2">
+                    <label asp-for="ReleaseYear" class="control-label"></label>
+                    <input asp-for="ReleaseYear" class="form-control" readonly />
+                    <span asp-validation-for="ReleaseYear" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-2">
+                    <label asp-for="Rating" class="control-label"></label>
+                    <input asp-for="Rating" class="form-control" readonly />
+                    <span asp-validation-for="Rating" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-2">
+                    <label asp-for="MovieLength" class="control-label"></label>
+                    <input asp-for="MovieLength" class="form-control" readonly />
+                    <span asp-validation-for="MovieLength" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Director" class="control-label"></label>
+                    <input asp-for="Director.FirstName" class="form-control" readonly />
+                    <span asp-validation-for="MovieLength" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mt-3">
+                    <a class="btn btn-outline-warning float-right" asp-action="Edit" asp-route-id="@Model.MovieId">Edit</a>
+                    <a class="btn btn-outline-secondary" asp-action="Index">Back to List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+*@
+<div class="row">
+    <div class="col-md-8 offset-2">
+        <div class="card mb-12">
+            <div class="row g-0">
+                <div class="col-md-12">
+                    <div class="card-header text-white bg-dark">
+                        <p class="card-text">
+                            <h5 class="card-title">
+                                @Model.Title
+                            </h5>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    @if (Model.Image != null)
+                    {
+                        var base64 = Convert.ToBase64String(Model.Image);
+                        var img = string.Format("data:image/jpg;base64,{0}", base64);
+                        <img src="@img" width="100%" height="100%" />
+                    }
+                    else
+                    {
+                        <img src="~/images/noimage.jpg" width="100%" height="100%"/>
+                    }
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <p class="card-text" style="font-size: 14px">@Model.Description</p>
+                        <p class="card-text" style="font-size: 14px">
+                            <b>Genres: </b> <br />
+                            @foreach (var genre in Model.Genres)
+                            {
+                                @genre.Name
+                                @:<br />
+                            }
+                        </p>
+                        <p class="card-text" style="font-size: 14px"><b>Director: </b>@Model.Director.FirstName</p>
+                        <p class="card-text" style="font-size: 14px"><b>Release Year: </b>@Model.ReleaseYear.ToString("dd MMM yy")</p>
+                        <p class="card-text" style="font-size: 14px">
+                            <b>Actors: </b>
+                            <hr />
+                            <div class="row">
+                                @foreach (var actor in Model.Actors)
+                                {
+                                    <div class="col text-center">
+                                        @if (actor.Image != null)
+                                        {
+                                            var base64 = Convert.ToBase64String(actor.Image);
+                                            var img = string.Format("data:image/jpg;base64,{0}", base64);
+                                            <img class="border-info rounded-circle" src="@img" style="max-width: 150px; height:150px" />
+                                        }
+                                        else
+                                        {
+                                            <img src="~/images/noimage.jpg" style="max-width: 150px" class="border-info rounded-circle" />
+                                        }
+                                        <br />
+                                        <a asp-controller="Actors" asp-action="Details" asp-route-id="@actor.ActorId" style="text-decoration:none; color:black">@actor.FirstName</a>
+                                    </div>
+                                }
+                            </div>
+                        </p>
+
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="card-footer">
+                        <p class="card-text">
+                            <a class="btn btn-outline-dark float-right" asp-action="Index">
+                                Back to List
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

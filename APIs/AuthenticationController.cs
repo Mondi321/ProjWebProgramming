@@ -18,11 +18,13 @@ namespace ProjWebProgramming.APIs
     {
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly SignInManager<User> _signInManager;
         //private readonly JwtConfig _jwtConfig;
-        public AuthenticationController(UserManager<User> userManager, IConfiguration configuration)
+        public AuthenticationController(UserManager<User> userManager, IConfiguration configuration, SignInManager<User> signInManager = null)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _signInManager = signInManager;
             //_jwtConfig = jwtConfig;
         }
 
@@ -56,6 +58,8 @@ namespace ProjWebProgramming.APIs
                 if (isCreated.Succeeded)
                 {
                     var token = GenerateJwtToken(newUser);
+
+                    await _userManager.AddToRoleAsync(newUser, "User");
 
                     return Ok(new AuthResult()
                     {
@@ -96,9 +100,9 @@ namespace ProjWebProgramming.APIs
                         Result = false
                     });
                 }
-                var isCorrect = await _userManager.CheckPasswordAsync(existingUser, loginRequestDto.Password);
+                var isCorrect = await _signInManager.PasswordSignInAsync(existingUser, loginRequestDto.Password, false, false);
 
-                if (!isCorrect)
+                if (!isCorrect.Succeeded)
                 {
                     return BadRequest(new AuthResult()
                     {
@@ -161,13 +165,14 @@ namespace ProjWebProgramming.APIs
             {
                 Subject = new ClaimsIdentity(new[]
                 {
+                    new Claim(ClaimTypes.Name, user.UserName),
                     new Claim("Id", user.Id.ToString()),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                     new Claim(JwtRegisteredClaimNames.Email, value:user.Email),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToUniversalTime().ToString())
                 }),
-                Expires = DateTime.Now.AddHours(1),
+                Expires = DateTime.Now.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
 

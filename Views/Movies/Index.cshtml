@@ -1,5 +1,4 @@
 ﻿@model IEnumerable<ProjWebProgramming.Models.Movie>
-
 @{
     ViewData["Title"] = "Index";
 }
@@ -9,57 +8,62 @@
 <p>
     <a class="btn btn-primary" asp-action="Create">Create New</a>
 </p>
-<table class="table table-striped table-light">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReleaseYear)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Rating)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MovieLength)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Director)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReleaseYear)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Rating)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MovieLength)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Director.FirstName)
-            </td>
-            <td>
-                    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.MovieId">Edit</a> |
-                    <a class="btn btn-info" asp-action="Details" asp-route-id="@item.MovieId">Details</a> |
-                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.MovieId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 col-xs-6 border-primary mb-3">
+            <div class="card mb-3" style="max-width: 540px;">
+                <div class="row g-0">
+                    <div class="col-md-12">
+                        <div class="card-header text-white bg-dark">
+                            <p class="card-text">
+                                <h5 class="card-title">
+                                    @item.Title
+                                        <a class="text-white float-end" asp-action="Edit" asp-route-id="@item.MovieId"><i class="bi bi-pencil-square"></i></a>
+                                </h5>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        @if (item.Image != null)
+                        {
+                            var base64 = Convert.ToBase64String(item.Image);
+                            var img = string.Format("data:image/jpg;base64,{0}", base64);
+                            <img src="@img" width="100%" height="100%"/>
+                        }
+                        else
+                        {
+                            <img src="~/images/noimage.jpg" width="100%" height="100%"/>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-body">
+                            <p class="card-text" style="font-size: 14px">@item.Description</p>
+                            <p class="card-text" style="font-size: 14px">
+                                <b>Genres: </b> <br />
+                                @foreach(var genre in item.Genres)
+                                {
+                                    @genre.Name
+                                    @:<br />
+                                }
+                            </p>
+                            <p class="card-text" style="font-size: 14px"><b>Director: </b>@item.Director.FirstName</p>
+                            <p class="card-text" style="font-size: 14px"><b>Start Date: </b>@item.ReleaseYear.ToString("dd MMM yy")</p>
+                            <p class="card-text" style="font-size: 14px"><b>Movie Length: </b>@item.MovieLength</p>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="card-footer" style="height: 100%">
+                            <p class="card-text" style="height:100%">
+                                <a class="btn btn-outline-dark float-end mb-2" asp-action="Details" asp-route-id="@item.MovieId">
+                                    <i class="bi bi-eye-fill"></i> Show Details
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>

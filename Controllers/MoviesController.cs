@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +23,7 @@ namespace ProjWebProgramming.Controllers
         // GET: Movies
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Movies.Include(m => m.Director);
+            var applicationDbContext = _context.Movies.Include(m => m.Director).Include(m => m.Genres).Include(m => m.Actors);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -36,6 +37,8 @@ namespace ProjWebProgramming.Controllers
 
             var movie = await _context.Movies
                 .Include(m => m.Director)
+                .Include(m => m.Genres)
+                .Include(m => m.Actors)
                 .FirstOrDefaultAsync(m => m.MovieId == id);
             if (movie == null)
             {
@@ -106,7 +109,7 @@ namespace ProjWebProgramming.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("MovieId,Title,Description,ReleaseYear,Rating,MovieLength,DirectorId")] Movie movie)
+        public async Task<IActionResult> Edit(Guid id, [Bind("MovieId,Title,Description,ReleaseYear,Rating,MovieLength,DirectorId,Image")] Movie movie)
         {
             if (id != movie.MovieId)
             {
@@ -117,6 +120,20 @@ namespace ProjWebProgramming.Controllers
             {
                 try
                 {
+                    var files = HttpContext.Request.Form.Files;
+                    if (files.Count() > 0)
+                    {
+                        byte[] pic = null;
+                        using (var fileStream = files[0].OpenReadStream())
+                        {
+                            using (var memoryStream = new MemoryStream())
+                            {
+                                fileStream.CopyTo(memoryStream);
+                                pic = memoryStream.ToArray();
+                            }
+                            movie.Image = pic;
+                        }
+                    }
                     _context.Update(movie);
                     await _context.SaveChangesAsync();
                 }

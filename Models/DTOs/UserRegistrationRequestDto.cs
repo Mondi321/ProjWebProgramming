@@ -1,4 +1,4 @@
-﻿using Microsoft.Build.Framework;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ProjWebProgramming.Models.DTOs
 {
@@ -11,6 +11,7 @@ namespace ProjWebProgramming.Models.DTOs
         [Required]
         public string Email { get; set; } = string.Empty;
         [Required]
+        [RegularExpression("(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{4,20}$", ErrorMessage = "Password must contain uppercase and lowercase letters and digits")]
         public string Password { get; set; } = string.Empty;
     }
 }

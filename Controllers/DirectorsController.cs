@@ -54,10 +54,24 @@ namespace ProjWebProgramming.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DirectorId,FirstName,LastName,Nationality,BirthDate")] Director director)
+        public async Task<IActionResult> Create([Bind("DirectorId,FirstName,LastName,Nationality,BirthDate,Image")] Director director)
         {
             if (ModelState.IsValid)
             {
+                var files = HttpContext.Request.Form.Files;
+                if (files.Count() > 0)
+                {
+                    byte[] pic = null;
+                    using (var fileStream = files[0].OpenReadStream())
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            fileStream.CopyTo(memoryStream);
+                            pic = memoryStream.ToArray();
+                        }
+                        director.Image = pic;
+                    }
+                }
                 director.DirectorId = Guid.NewGuid();
                 _context.Add(director);
                 await _context.SaveChangesAsync();
@@ -87,7 +101,7 @@ namespace ProjWebProgramming.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("DirectorId,FirstName,LastName,Nationality,BirthDate")] Director director)
+        public async Task<IActionResult> Edit(Guid id, [Bind("DirectorId,FirstName,LastName,Nationality,BirthDate,Image")] Director director)
         {
             if (id != director.DirectorId)
             {
@@ -98,6 +112,20 @@ namespace ProjWebProgramming.Controllers
             {
                 try
                 {
+                    var files = HttpContext.Request.Form.Files;
+                    if (files.Count() > 0)
+                    {
+                        byte[] pic = null;
+                        using (var fileStream = files[0].OpenReadStream())
+                        {
+                            using (var memoryStream = new MemoryStream())
+                            {
+                                fileStream.CopyTo(memoryStream);
+                                pic = memoryStream.ToArray();
+                            }
+                            director.Image = pic;
+                        }
+                    }
                     _context.Update(director);
                     await _context.SaveChangesAsync();
                 }

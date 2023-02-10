@@ -3,8 +3,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ProjWebProgramming.AutoMapper.Mapping;
 using ProjWebProgramming.Configurations;
 using ProjWebProgramming.Data;
+using ProjWebProgramming.Data.Cart;
+using ProjWebProgramming.Data.Services;
 using ProjWebProgramming.Middleware;
 using ProjWebProgramming.Models;
 using System.Text;
@@ -24,11 +27,22 @@ builder.Services.AddCors(opt =>
     });
 });
 
+
+builder.Services.AddScoped<IMoviesService, MoviesService>();
+builder.Services.AddScoped<IOrdersService, OrdersService>();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddScoped(sc => ShoppingCart.GetShoppingCart(sc));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddAutoMapper(typeof(MappingModels).Assembly);
 
 builder.Services.AddDefaultIdentity<User>(options => { options.SignIn.RequireConfirmedAccount = false; options.User.RequireUniqueEmail = true; options.Password.RequireNonAlphanumeric = false; })
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddMemoryCache();
+builder.Services.AddSession();
 
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection(key: "JwtConfig"));
 
@@ -91,14 +105,17 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseSession();
 app.UseCors("CorsPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-//app.UseSession();
 
+
+app.MapControllerRoute(
+    name: "MyArea",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

@@ -9,5 +9,6 @@
         public DateTime BirthDate { get; set; }
         public byte[]? Image { get; set; }
         public List<Movie>? Movies { get; set; }
+        public List<TvShow>? TvShows { get; set; }
     }
 }

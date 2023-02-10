@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ProjWebProgramming.Data;
 
 namespace ProjWebProgramming.Controllers
 {
+    [Area("Admin")]
+    [Authorize(Roles ="Admin")]
     public class RolesController : Controller
     {
         private readonly ILogger<RolesController> _logger;

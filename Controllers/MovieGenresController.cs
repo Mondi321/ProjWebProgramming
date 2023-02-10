@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +12,8 @@ using ProjWebProgramming.Models;
 
 namespace ProjWebProgramming.Controllers
 {
+    [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class MovieGenresController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -20,10 +24,47 @@ namespace ProjWebProgramming.Controllers
         }
 
         // GET: MovieGenres
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+              string sortOrder,
+              string currentFilter,
+              string searchString,
+              int? pageNumber)
         {
-            var applicationDbContext = _context.MovieGenre.Include(m => m.Genre).Include(m => m.Movie);
-            return View(await applicationDbContext.ToListAsync());
+
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["CurrentFilter"] = searchString;
+
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+
+                searchString = currentFilter;
+
+            }
+            var movieGenres = from g in _context.MovieGenre.Include(m => m.Genre).Include(m => m.Movie)
+                              select g;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                movieGenres = movieGenres.Where(s => s.Movie.Title.Contains(searchString));
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    movieGenres = movieGenres.OrderByDescending(g => g.Movie.Title);
+                    break;
+                default:
+                    movieGenres = movieGenres.OrderBy(g => g.Movie.Title);
+                    break;
+            }
+            int pageSize = 3;
+
+            return View(await PaginatedList<MovieGenre>.CreateAsync(movieGenres.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
         // GET: MovieGenres/Details/5
@@ -161,7 +202,7 @@ namespace ProjWebProgramming.Controllers
         //}
 
         //GET: MovieGenres/Delete/5
-        public async Task<IActionResult> Delete(Guid movieId, Guid genreId)
+        public async Task<IActionResult> Delete(Guid? movieId, Guid? genreId)
         {
             if (movieId == null || genreId == null || _context.MovieGenre == null)
             {

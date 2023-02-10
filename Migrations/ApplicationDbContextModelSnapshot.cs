@@ -186,6 +186,36 @@ namespace ProjWebProgramming.Migrations
                     b.ToTable("Actor");
                 });
 
+            modelBuilder.Entity("ProjWebProgramming.Models.Contact", b =>
+                {
+                    b.Property<Guid>("ContactId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("Phone")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ContactId");
+
+                    b.ToTable("Contact");
+                });
+
             modelBuilder.Entity("ProjWebProgramming.Models.Director", b =>
                 {
                     b.Property<Guid>("DirectorId")
@@ -246,8 +276,14 @@ namespace ProjWebProgramming.Migrations
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
 
+                    b.Property<byte[]>("ImageCarousel")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<decimal>("MovieLength")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
 
                     b.Property<decimal>("Rating")
                         .HasColumnType("decimal(18,2)");
@@ -299,6 +335,199 @@ namespace ProjWebProgramming.Migrations
                     b.HasIndex("GenreId");
 
                     b.ToTable("MovieGenre");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.Order", b =>
+                {
+                    b.Property<Guid>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.OrderItem", b =>
+                {
+                    b.Property<Guid>("OrderItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("MovieId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
+                    b.HasKey("OrderItemId");
+
+                    b.HasIndex("MovieId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderItems");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.Review", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Mesazhi")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RatingValue")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Review");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.ShoppingCartItem", b =>
+                {
+                    b.Property<Guid>("ShoppingCartItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("MovieId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ShoppingCartId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ShoppingCartItemId");
+
+                    b.HasIndex("MovieId");
+
+                    b.ToTable("ShoppingCartItems");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.TvShow", b =>
+                {
+                    b.Property<Guid>("TvShowId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("DirectorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("EpisodeLength")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Episodes")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("ImageCarousel")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<decimal>("Rating")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("ReleaseYear")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Seasons")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("TvShowId");
+
+                    b.HasIndex("DirectorId");
+
+                    b.ToTable("TvShows");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.TvShowActor", b =>
+                {
+                    b.Property<Guid>("ActorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TvShowId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ActorId", "TvShowId");
+
+                    b.HasIndex("TvShowId");
+
+                    b.ToTable("TvShowActors");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.TvShowGenre", b =>
+                {
+                    b.Property<Guid>("TvShowId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("GenreId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("TvShowId", "GenreId");
+
+                    b.HasIndex("GenreId");
+
+                    b.ToTable("TvShowGenres");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.TvShowWishlist", b =>
+                {
+                    b.Property<Guid>("TvShowId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("TvShowId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TvShowWishlists");
                 });
 
             modelBuilder.Entity("ProjWebProgramming.Models.User", b =>
@@ -380,7 +609,9 @@ namespace ProjWebProgramming.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("MovieId", "UserId");
 
@@ -489,6 +720,124 @@ namespace ProjWebProgramming.Migrations
                     b.Navigation("Movie");
                 });
 
+            modelBuilder.Entity("ProjWebProgramming.Models.Order", b =>
+                {
+                    b.HasOne("ProjWebProgramming.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.OrderItem", b =>
+                {
+                    b.HasOne("ProjWebProgramming.Models.Movie", "Movie")
+                        .WithMany()
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjWebProgramming.Models.Order", "Order")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Movie");
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.Review", b =>
+                {
+                    b.HasOne("ProjWebProgramming.Models.User", "User")
+                        .WithMany("Reviews")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.ShoppingCartItem", b =>
+                {
+                    b.HasOne("ProjWebProgramming.Models.Movie", "Movie")
+                        .WithMany()
+                        .HasForeignKey("MovieId");
+
+                    b.Navigation("Movie");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.TvShow", b =>
+                {
+                    b.HasOne("ProjWebProgramming.Models.Director", "Director")
+                        .WithMany("TvShows")
+                        .HasForeignKey("DirectorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Director");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.TvShowActor", b =>
+                {
+                    b.HasOne("ProjWebProgramming.Models.Actor", "Actor")
+                        .WithMany("TvShowActors")
+                        .HasForeignKey("ActorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjWebProgramming.Models.TvShow", "TvShow")
+                        .WithMany("TvShowActors")
+                        .HasForeignKey("TvShowId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Actor");
+
+                    b.Navigation("TvShow");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.TvShowGenre", b =>
+                {
+                    b.HasOne("ProjWebProgramming.Models.Genre", "Genre")
+                        .WithMany("TvShowGenres")
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjWebProgramming.Models.TvShow", "TvShow")
+                        .WithMany("TvShowGenres")
+                        .HasForeignKey("TvShowId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Genre");
+
+                    b.Navigation("TvShow");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.TvShowWishlist", b =>
+                {
+                    b.HasOne("ProjWebProgramming.Models.TvShow", "TvShow")
+                        .WithMany("TvShowWishlists")
+                        .HasForeignKey("TvShowId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjWebProgramming.Models.User", "User")
+                        .WithMany("TvShowWishlists")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TvShow");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ProjWebProgramming.Models.Wishlist", b =>
                 {
                     b.HasOne("ProjWebProgramming.Models.Movie", "Movie")
@@ -511,16 +860,22 @@ namespace ProjWebProgramming.Migrations
             modelBuilder.Entity("ProjWebProgramming.Models.Actor", b =>
                 {
                     b.Navigation("MovieActors");
+
+                    b.Navigation("TvShowActors");
                 });
 
             modelBuilder.Entity("ProjWebProgramming.Models.Director", b =>
                 {
                     b.Navigation("Movies");
+
+                    b.Navigation("TvShows");
                 });
 
             modelBuilder.Entity("ProjWebProgramming.Models.Genre", b =>
                 {
                     b.Navigation("MovieGenres");
+
+                    b.Navigation("TvShowGenres");
                 });
 
             modelBuilder.Entity("ProjWebProgramming.Models.Movie", b =>
@@ -532,8 +887,26 @@ namespace ProjWebProgramming.Migrations
                     b.Navigation("Wishlists");
                 });
 
+            modelBuilder.Entity("ProjWebProgramming.Models.Order", b =>
+                {
+                    b.Navigation("OrderItems");
+                });
+
+            modelBuilder.Entity("ProjWebProgramming.Models.TvShow", b =>
+                {
+                    b.Navigation("TvShowActors");
+
+                    b.Navigation("TvShowGenres");
+
+                    b.Navigation("TvShowWishlists");
+                });
+
             modelBuilder.Entity("ProjWebProgramming.Models.User", b =>
                 {
+                    b.Navigation("Reviews");
+
+                    b.Navigation("TvShowWishlists");
+
                     b.Navigation("Wishlists");
                 });
 #pragma warning restore 612, 618

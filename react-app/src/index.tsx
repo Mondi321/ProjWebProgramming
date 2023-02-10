@@ -3,11 +3,13 @@ import ReactDOM from 'react-dom/client';
 import App from './app/layout/App';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap';
 import 'react-toastify/dist/ReactToastify.min.css';
 import { Router } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import { store, StoreContext } from './app/stores/store';
 import './app/layout/formStyle.css';
+import './index.css';
 
 export const history = createBrowserHistory();
 

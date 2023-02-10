@@ -11,6 +11,8 @@ using ProjWebProgramming.Models;
 
 namespace ProjWebProgramming.Controllers
 {
+    [Area("Admin")]
+    [Authorize(Roles ="Admin")]
     public class ActorsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -21,9 +23,52 @@ namespace ProjWebProgramming.Controllers
         }
 
         // GET: Actors
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+              string sortOrder,
+              string currentFilter,
+              string searchString,
+              int? pageNumber)
         {
-              return View(await _context.Actor.ToListAsync());
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["CurrentFilter"] = searchString;
+
+
+
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+
+                searchString = currentFilter;
+
+            }
+
+
+
+            var actors = from g in _context.Actor
+                         select g;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                actors = actors.Where(s => s.FirstName.Contains(searchString));
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    actors = actors.OrderByDescending(g => g.FirstName);
+                    break;
+                default:
+                    actors = actors.OrderBy(g => g.FirstName);
+                    break;
+            }
+            int pageSize = 3;
+
+            return View(await PaginatedList<Actor>.CreateAsync(actors.AsNoTracking(), pageNumber ?? 1, pageSize));
+
         }
 
         // GET: Actors/Details/5

@@ -1,0 +1,96 @@
+.contactForm{
+    background: rgba(28, 28, 28, 0.703);
+    width: 100%;
+    height: 100vh;
+}
+.contactForm img{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    opacity: 0.2;
+}
+.contactForm h1{
+    text-align: center;
+    color: rgb(102, 31, 184);
+    margin-bottom: 20px;
+}
+
+.contactForm-permbajtja{
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    width: 650px;
+    height: 500px;
+    left: 50%;
+    margin-left: -325px;
+    margin-top: 30px;
+}
+
+.contactForm-Formik{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.inputsOne{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+}
+
+.inputsTwo{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+}
+
+.contactForm .button{
+    align-self: flex-end;
+    padding: 10px 20px;
+    background-color: rgb(102, 31, 184);
+    border-radius: 30px;
+}
+
+.contactForm .button:hover{
+    background-color: rgb(102, 31, 184);
+}
+
+.contactForm-Formik :nth-child(3){
+    width: 470px;
+}
+
+.contactForm-Formik .text-input{
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    width: 300px;
+    height: 85px;
+}
+
+.contactForm-Formik .text-area{
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    width: 650px;
+    height: 190px;
+}
+
+.contactForm-Formik .text-area textarea{
+    height: 150px;
+    background-color: rgb(20, 20, 20);
+    color: white;
+    border: 3px solid rgb(102, 31, 184);
+    border-radius: 20px;
+}
+.contactForm-Formik .text-input input{
+    height: 50px;
+    background-color: rgb(20, 20, 20);
+    color: white;
+    border: 3px solid rgb(102, 31, 184);
+    border-radius: 20px;
+}

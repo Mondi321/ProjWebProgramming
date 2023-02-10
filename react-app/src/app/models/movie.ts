@@ -11,6 +11,7 @@ export interface Movie{
     rating: number;
     movieLength: number;
     image?: string;
+    imageCarousel?:string;
     genres?: Genre[];
     actors?: Actor[];
     users?: User[];

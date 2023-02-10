@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +12,8 @@ using ProjWebProgramming.Models;
 
 namespace ProjWebProgramming.Controllers
 {
+    [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class DirectorsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -20,9 +24,52 @@ namespace ProjWebProgramming.Controllers
         }
 
         // GET: Directors
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+              string sortOrder,
+              string currentFilter,
+              string searchString,
+              int? pageNumber)
         {
-              return View(await _context.Directors.ToListAsync());
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["CurrentFilter"] = searchString;
+
+
+
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+
+                searchString = currentFilter;
+
+            }
+
+
+
+            var directors = from g in _context.Directors
+                         select g;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                directors = directors.Where(s => s.FirstName.Contains(searchString));
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    directors = directors.OrderByDescending(g => g.FirstName);
+                    break;
+                default:
+                    directors = directors.OrderBy(g => g.FirstName);
+                    break;
+            }
+            int pageSize = 3;
+
+            return View(await PaginatedList<Director>.CreateAsync(directors.AsNoTracking(), pageNumber ?? 1, pageSize));
+
         }
 
         // GET: Directors/Details/5

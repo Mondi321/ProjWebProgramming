@@ -19,12 +19,14 @@ namespace ProjWebProgramming.APIs
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
         private readonly SignInManager<User> _signInManager;
+        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         //private readonly JwtConfig _jwtConfig;
-        public AuthenticationController(UserManager<User> userManager, IConfiguration configuration, SignInManager<User> signInManager = null)
+        public AuthenticationController(UserManager<User> userManager, IConfiguration configuration, SignInManager<User> signInManager, RoleManager<IdentityRole<Guid>> roleManager)
         {
             _userManager = userManager;
             _configuration = configuration;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             //_jwtConfig = jwtConfig;
         }
 
@@ -57,12 +59,15 @@ namespace ProjWebProgramming.APIs
 
                 if (isCreated.Succeeded)
                 {
-                    var token = GenerateJwtToken(newUser);
+                    var token = await GenerateJwtToken(newUser);
 
                     await _userManager.AddToRoleAsync(newUser, "User");
 
                     return Ok(new AuthResult()
                     {
+                        FirstName = newUser.FirstName,
+                        UserName = newUser.UserName,
+                        Roli = await _userManager.GetRolesAsync(newUser),
                         Result = true,
                         Token = token
                     });
@@ -114,10 +119,13 @@ namespace ProjWebProgramming.APIs
                     });
                 }
 
-                var jwtToken = GenerateJwtToken(existingUser);
+                var jwtToken = await GenerateJwtToken(existingUser);
 
                 return Ok(new AuthResult()
                 {
+                    FirstName = existingUser.FirstName,
+                    UserName = existingUser.UserName,
+                    Roli = await _userManager.GetRolesAsync(existingUser),
                     Token = jwtToken,
                     Result = true
                 });
@@ -133,7 +141,7 @@ namespace ProjWebProgramming.APIs
             });
         }
 
-        [Authorize]
+        [Authorize(AuthenticationSchemes ="Api")]
         [HttpGet]
         public async Task<IActionResult> CurrentUser()
         {
@@ -143,35 +151,29 @@ namespace ProjWebProgramming.APIs
                 return NotFound();
             }
 
-            var jwtToken = GenerateJwtToken(user);
+            var jwtToken = await GenerateJwtToken(user);
             var rolet = await _userManager.GetRolesAsync(user);
 
             return Ok(new AuthResult()
             {
                 Result = true,
                 FirstName= user.FirstName,
+                UserName = user.UserName,
                 Token = jwtToken,
                 Roli = rolet
             });
         }
 
-        private string GenerateJwtToken(User user)
+        public async Task<string> GenerateJwtToken(User user)
         {
+            var claims = await GetAllValidClaims(user);
             var jwtTokenHandler = new JwtSecurityTokenHandler();
 
             var key = Encoding.UTF8.GetBytes(_configuration.GetSection("JwtConfig:Secret").Value);
 
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim("Id", user.Id.ToString()),
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Email, value:user.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToUniversalTime().ToString())
-                }),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.Now.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
@@ -181,6 +183,43 @@ namespace ProjWebProgramming.APIs
             var jwtToken = jwtTokenHandler.WriteToken(token);
 
             return jwtToken;
+        }
+        private async Task<List<Claim>> GetAllValidClaims(User user)
+        {
+            var claims = new List<Claim>
+            {
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim("Id", user.Id.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Email, value:user.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToUniversalTime().ToString())
+            };
+
+            var userClaims = await _userManager.GetClaimsAsync(user);
+            claims.AddRange(userClaims);
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            foreach (var userRole in userRoles)
+            {
+
+                var role = await _roleManager.FindByNameAsync(userRole);
+
+                if (role != null)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, userRole));
+
+                    var roleClaims = await _roleManager.GetClaimsAsync(role);
+
+                    foreach (var roleClaim in roleClaims)
+                    {
+                        claims.Add(roleClaim);
+                    }
+                }
+            }
+            return claims;
         }
     }
 }

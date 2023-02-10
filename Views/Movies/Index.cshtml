@@ -3,11 +3,6 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
-
-<p>
-    <a class="btn btn-primary" asp-action="Create">Create New</a>
-</p>
 <div class="row">
     @foreach (var item in Model)
     {
@@ -17,10 +12,15 @@
                     <div class="col-md-12">
                         <div class="card-header text-white bg-dark">
                             <p class="card-text">
-                                <h5 class="card-title">
+                                <h6 class="card-title">
                                     @item.Title
-                                        <a class="text-white float-end" asp-action="Edit" asp-route-id="@item.MovieId"><i class="bi bi-pencil-square"></i></a>
-                                </h5>
+                                    @if(User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                                    {
+                                                                            <a class="text-white float-end"  asp-action="Delete" asp-route-id="@item.MovieId"><i class="bi bi-trash-fill"></i></a>
+                                        <a class="text-white float-end" style="margin-right:10px;" asp-action="Edit" asp-route-id="@item.MovieId"><i class="bi bi-pencil-square"></i></a>
+                                    }
+
+                                </h6>
                             </p>
                         </div>
                     </div>
@@ -38,7 +38,6 @@
                     </div>
                     <div class="col-md-6">
                         <div class="card-body">
-                            <p class="card-text" style="font-size: 14px">@item.Description</p>
                             <p class="card-text" style="font-size: 14px">
                                 <b>Genres: </b> <br />
                                 @foreach(var genre in item.Genres)
@@ -48,15 +47,21 @@
                                 }
                             </p>
                             <p class="card-text" style="font-size: 14px"><b>Director: </b>@item.Director.FirstName</p>
-                            <p class="card-text" style="font-size: 14px"><b>Start Date: </b>@item.ReleaseYear.ToString("dd MMM yy")</p>
+                            <p class="card-text" style="font-size: 14px"><b>Release Year: </b>@item.ReleaseYear.ToString("dd MMM yy")</p>
                             <p class="card-text" style="font-size: 14px"><b>Movie Length: </b>@item.MovieLength</p>
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="card-footer" style="height: 100%">
                             <p class="card-text" style="height:100%">
-                                <a class="btn btn-outline-dark float-end mb-2" asp-action="Details" asp-route-id="@item.MovieId">
+                                <a class="btn btn-outline-dark float-end mb-2" style="font-size:12px" asp-action="Details" asp-route-id="@item.MovieId">
                                     <i class="bi bi-eye-fill"></i> Show Details
+                                </a>
+                                <a class="btn btn-success text-white" style="font-size:12px"
+                                   asp-controller="Orders" 
+                                   asp-action="AddItemToShoppingCart" 
+                                   asp-route-id="@item.MovieId">
+                                    <i class="bi bi-cart-plus"></i> Add to Cart (Price @item.Price.ToString("c"))
                                 </a>
                             </p>
                         </div>
@@ -67,3 +72,5 @@
     }
 
 </div>
+
+@await Html.PartialAsync("_CreateItem", "Movies") 

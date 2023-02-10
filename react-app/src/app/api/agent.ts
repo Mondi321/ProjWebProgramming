@@ -1,6 +1,12 @@
 import axios, { AxiosError, AxiosResponse } from "axios"
 import { toast } from "react-toastify";
 import { history } from "../..";
+import { Contact } from "../models/contact";
+import { Genre } from "../models/genre";
+import { Movie } from "../models/movie";
+import { MovieGenre } from "../models/movieGenre";
+import { Review } from "../models/review";
+import { TvShow } from "../models/tvShow";
 import { User, UserFormValues } from "../models/user";
 import { store } from "../stores/store";
 
@@ -45,6 +51,9 @@ axios.interceptors.response.use(async response => {
         case 401:
             toast.error('unathorized');
             break;
+        case 403:
+            toast.error('Forbidden');
+            break;
         case 404:
             history.push('/not-found');
             break;
@@ -74,8 +83,37 @@ const Account ={
     register: (user: UserFormValues) => requests.post<User>('/authentication/register', user)
 }
 
+const Movies = {
+    list: () => requests.get<Movie[]>('/movies'),
+    listTopRated: () => requests.get<Movie[]>('/movies/toprated'),
+    listByGenre: (id:string) => requests.get<MovieGenre[]>(`/bygenre/${id}`),
+    details: (id: string) => requests.get<Movie>(`/movies/${id}`)
+}
+
+const TvShows = {
+    list: () => requests.get<TvShow[]>('/tvshows'),
+    details: (id: string) => requests.get<TvShow>(`/tvshows/${id}`)
+}
+
+const Genres = {
+    list: () => requests.get<Genre[]>('/genres')
+}
+
+const Reviews = {
+    create: (review: Review) => requests.post<void>('/reviews', review)
+}
+
+const Contacts = {
+    create: (contact: Contact) => requests.post<void>('/contacts', contact)
+}
+
 const agent = {
-    Account
+    Account,
+    Movies,
+    TvShows,
+    Genres,
+    Reviews,
+    Contacts
 }
 
 export default agent;

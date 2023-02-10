@@ -10,5 +10,7 @@
         public byte[]? Image { get; set; }
         public ICollection<Movie> Movies { get; set; } = new List<Movie>();
         public List<MovieActors>? MovieActors { get; set; }
+        public ICollection<TvShow> TvShows { get; set; } = new List<TvShow>();
+        public List<TvShowActor>? TvShowActors { get; set; }
     }
 }

@@ -1,7 +1,7 @@
 import { Movie } from "./movie";
 
 export interface User {
-    id: string;
+    id?: string;
     firstName: string;
     userName: string;
     token: string;

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +12,8 @@ using ProjWebProgramming.Models;
 
 namespace ProjWebProgramming.Controllers
 {
+    [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class GenresController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -28,7 +32,9 @@ namespace ProjWebProgramming.Controllers
         {
             ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+            ViewData["CurrentFilter"] = searchString;
+
+
 
             if (searchString != null)
             {
@@ -41,15 +47,23 @@ namespace ProjWebProgramming.Controllers
 
             }
 
-            ViewData["CurrentFilter"] = searchString;
+
 
             var genres = from g in _context.Genres
                               select g;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                genres = genres.Where(s => s.Name.Contains(searchString));
+            }
 
             switch (sortOrder)
             {
                 case "name_desc":
                     genres = genres.OrderByDescending(g => g.Name);
+                    break;
+                default:
+                    genres = genres.OrderBy(g => g.Name);
                     break;
             }
             int pageSize = 3;

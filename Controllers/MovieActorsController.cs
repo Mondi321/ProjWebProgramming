@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using ProjWebProgramming.Data;
 using ProjWebProgramming.Models;
 
 namespace ProjWebProgramming.Controllers
 {
+    [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class MovieActorsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -20,10 +25,52 @@ namespace ProjWebProgramming.Controllers
         }
 
         // GET: MovieActors
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+              string sortOrder,
+              string currentFilter,
+              string searchString,
+              int? pageNumber)
         {
-            var applicationDbContext = _context.MovieActors.Include(m => m.Actor).Include(m => m.Movie);
-            return View(await applicationDbContext.ToListAsync());
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["CurrentFilter"] = searchString;
+
+
+
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+
+                searchString = currentFilter;
+
+            }
+
+
+
+            var movieActors = from g in _context.MovieActors.Include(m => m.Actor).Include(m => m.Movie)
+                              select g;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                movieActors = movieActors.Where(s => s.Movie.Title.Contains(searchString));
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    movieActors = movieActors.OrderByDescending(g => g.Movie.Title);
+                    break;
+                default:
+                    movieActors = movieActors.OrderBy(g => g.Movie.Title);
+                    break;
+            }
+            int pageSize = 3;
+
+            return View(await PaginatedList<MovieActors>.CreateAsync(movieActors.AsNoTracking(), pageNumber ?? 1, pageSize));
+
         }
 
         // GET: MovieActors/Details/5
@@ -124,7 +171,7 @@ namespace ProjWebProgramming.Controllers
         //}
 
         // GET: MovieActors/Delete/5
-        public async Task<IActionResult> Delete(Guid movieId, Guid actorId)
+        public async Task<IActionResult> Delete(Guid? movieId, Guid? actorId)
         {
             if (movieId == null || actorId == null || _context.MovieActors == null)
             {

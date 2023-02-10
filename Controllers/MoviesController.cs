@@ -21,6 +21,7 @@ namespace ProjWebProgramming.Controllers
         }
 
         // GET: Movies
+        [Authorize(Roles ="User,Admin")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Movies.Include(m => m.Director).Include(m => m.Genres).Include(m => m.Actors);
@@ -28,6 +29,7 @@ namespace ProjWebProgramming.Controllers
         }
 
         // GET: Movies/Details/5
+        [Authorize(Roles = "User,Admin")]
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null || _context.Movies == null)
@@ -48,7 +50,25 @@ namespace ProjWebProgramming.Controllers
             return View(movie);
         }
 
+        [Authorize(Roles = "User,Admin")]
+        public async Task<IActionResult> Filter(string searchString)
+        {
+            var allMovies = await _context.Movies.Include(m => m.Director).Include(m => m.Genres).Include(m => m.Actors).ToListAsync();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                var filteredResult = allMovies.Where(n => n.Title.ToLower().Contains(searchString.ToLower()) || n.Description.ToLower().Contains(searchString.ToLower())).ToList();
+
+                //var filteredResultNew = allMovies.Where(n => string.Equals(n.Title, searchString, StringComparison.CurrentCultureIgnoreCase) || string.Equals(n.Description, searchString, StringComparison.CurrentCultureIgnoreCase)).ToList();
+
+                return View("Index", filteredResult);
+            }
+
+            return View("Index", allMovies);
+        }
+
         // GET: Movies/Create
+        [Authorize(Roles ="Admin")]
         public IActionResult Create()
         {
             ViewData["DirectorId"] = new SelectList(_context.Directors, "DirectorId", "FirstName");
@@ -58,9 +78,10 @@ namespace ProjWebProgramming.Controllers
         // POST: Movies/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MovieId,Title,Description,ReleaseYear,Rating,MovieLength,DirectorId,Image")] Movie movie)
+        public async Task<IActionResult> Create([Bind("MovieId,Title,Description,ReleaseYear,Rating,MovieLength,Price,DirectorId,Image,ImageCarousel")] Movie movie)
         {
             if (ModelState.IsValid)
             {
@@ -68,6 +89,7 @@ namespace ProjWebProgramming.Controllers
                 if(files.Count() > 0)
                 {
                     byte[] pic = null;
+                    byte[] picCarousel = null;
                     using(var fileStream = files[0].OpenReadStream())
                     {
                         using(var memoryStream = new MemoryStream())
@@ -76,6 +98,15 @@ namespace ProjWebProgramming.Controllers
                             pic = memoryStream.ToArray();
                         }
                         movie.Image = pic;
+                    }
+                    using (var fileStreamCarousel = files[1].OpenReadStream())
+                    {
+                        using (var memoryStreamCarousel = new MemoryStream())
+                        {
+                            fileStreamCarousel.CopyTo(memoryStreamCarousel);
+                            picCarousel = memoryStreamCarousel.ToArray();
+                        }
+                        movie.ImageCarousel = picCarousel;
                     }
                 }
                 movie.MovieId = Guid.NewGuid();
@@ -88,6 +119,7 @@ namespace ProjWebProgramming.Controllers
         }
 
         // GET: Movies/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null || _context.Movies == null)
@@ -107,9 +139,10 @@ namespace ProjWebProgramming.Controllers
         // POST: Movies/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("MovieId,Title,Description,ReleaseYear,Rating,MovieLength,DirectorId,Image")] Movie movie)
+        public async Task<IActionResult> Edit(Guid id, [Bind("MovieId,Title,Description,ReleaseYear,Rating,MovieLength,Price,DirectorId,Image,ImageCarousel")] Movie movie)
         {
             if (id != movie.MovieId)
             {
@@ -124,6 +157,7 @@ namespace ProjWebProgramming.Controllers
                     if (files.Count() > 0)
                     {
                         byte[] pic = null;
+                        byte[] picCarousel = null;
                         using (var fileStream = files[0].OpenReadStream())
                         {
                             using (var memoryStream = new MemoryStream())
@@ -132,6 +166,15 @@ namespace ProjWebProgramming.Controllers
                                 pic = memoryStream.ToArray();
                             }
                             movie.Image = pic;
+                        }
+                        using (var fileStreamCarousel = files[1].OpenReadStream())
+                        {
+                            using (var memoryStreamCarousel = new MemoryStream())
+                            {
+                                fileStreamCarousel.CopyTo(memoryStreamCarousel);
+                                picCarousel = memoryStreamCarousel.ToArray();
+                            }
+                            movie.ImageCarousel = picCarousel;
                         }
                     }
                     _context.Update(movie);
@@ -155,6 +198,7 @@ namespace ProjWebProgramming.Controllers
         }
 
         // GET: Movies/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null || _context.Movies == null)
@@ -176,6 +220,7 @@ namespace ProjWebProgramming.Controllers
         // POST: Movies/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             if (_context.Movies == null)
